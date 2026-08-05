@@ -88,6 +88,7 @@ function MainApp() {
   const [lang, setLang] = useState<Language>('pt');
   const [progress, setProgress] = useState<UserProgressData>({ games: {}, xp: 0 });
   const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
+  const [isInstalled, setIsInstalled] = useState<boolean>(() => checkIsStandalone());
   const [viewMode, setViewMode] = useState<'presentation' | 'dashboard'>(() => {
     if (checkIsStandalone()) {
       return 'dashboard';
@@ -121,6 +122,7 @@ function MainApp() {
     setProgress(loaded);
 
     if (checkIsStandalone()) {
+      setIsInstalled(true);
       setViewMode('dashboard');
     }
 
@@ -132,6 +134,7 @@ function MainApp() {
     const handleAppInstalled = () => {
       localStorage.setItem('neuromax_installed', 'true');
       localStorage.setItem('neuromax_view', 'dashboard');
+      setIsInstalled(true);
       setViewMode('dashboard');
     };
 
@@ -151,6 +154,7 @@ function MainApp() {
       if (outcome === 'accepted') {
         localStorage.setItem('neuromax_installed', 'true');
         localStorage.setItem('neuromax_view', 'dashboard');
+        setIsInstalled(true);
         setViewMode('dashboard');
         setDeferredPrompt(null);
       }
@@ -231,6 +235,7 @@ function MainApp() {
               localStorage.setItem('neuromax_view', 'dashboard');
               setViewMode('dashboard');
             }}
+            isInstalled={isInstalled}
           />
         ) : !selectedGame ? (
           <Dashboard
@@ -239,6 +244,7 @@ function MainApp() {
             onSelectGame={handleSelectGame}
             onOpenInstall={() => setIsInstallOpen(true)}
             onOpenPresentation={() => setViewMode('presentation')}
+            isInstalled={isInstalled}
           />
         ) : (
           <div className="w-full h-full flex flex-col bg-slate-50">

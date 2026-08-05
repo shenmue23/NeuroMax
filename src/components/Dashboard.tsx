@@ -39,9 +39,10 @@ interface DashboardProps {
   progress: UserProgressData;
   onSelectGame: (game: GameData) => void;
   onOpenInstall?: () => void;
+  onOpenPresentation?: () => void;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ lang, progress, onSelectGame, onOpenInstall }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ lang, progress, onSelectGame, onOpenInstall, onOpenPresentation }) => {
   const [currentCategory, setCurrentCategory] = useState<Category>('all');
   const t = I18N[lang];
 
@@ -70,18 +71,33 @@ export const Dashboard: React.FC<DashboardProps> = ({ lang, progress, onSelectGa
             </p>
           </div>
         </div>
-        {onOpenInstall && (
-          <button
-            onClick={() => {
-              playAudioFeedback('click');
-              onOpenInstall();
-            }}
-            className="w-full sm:w-auto px-4 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white font-black text-xs md:text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 shrink-0 cursor-pointer"
-          >
-            <i className="fa-solid fa-download"></i>
-            <span>{lang === 'fr' ? 'Guide d\'installation' : 'Guia de instalação'}</span>
-          </button>
-        )}
+        <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto shrink-0">
+          {onOpenPresentation && (
+            <button
+              onClick={() => {
+                playAudioFeedback('click');
+                onOpenPresentation();
+              }}
+              className="w-full sm:w-auto px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs md:text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+            >
+              <i className="fa-solid fa-file-lines"></i>
+              <span>{lang === 'fr' ? 'Affiche de présentation' : 'Cartaz de apresentação'}</span>
+            </button>
+          )}
+
+          {onOpenInstall && (
+            <button
+              onClick={() => {
+                playAudioFeedback('click');
+                onOpenInstall();
+              }}
+              className="w-full sm:w-auto px-4 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white font-black text-xs md:text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+            >
+              <i className="fa-solid fa-download"></i>
+              <span>{lang === 'fr' ? 'Guide d\'installation' : 'Guia de instalação'}</span>
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="mb-6 bg-indigo-50/50 p-5 md:p-6 rounded-2xl border border-indigo-100">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Language } from '../types';
 import { playAudioFeedback } from '../lib/audio';
+import { NeuromaxLogo } from './Logo';
 
 interface InstallModalProps {
   isOpen: boolean;
@@ -17,15 +18,19 @@ export const InstallModal: React.FC<InstallModalProps> = ({
   deferredPrompt,
   onTriggerInstall,
 }) => {
-  const [platform, setPlatform] = useState<'android' | 'ios'>('android');
+  const [platform, setPlatform] = useState<'android' | 'ios' | 'pc_mac'>('android');
   const [isStandalone, setIsStandalone] = useState<boolean>(false);
 
   useEffect(() => {
     // Detect OS
     const userAgent = window.navigator.userAgent.toLowerCase();
     const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
+    const isMacOrPc = /macintosh|mac os x|windows|linux/.test(userAgent) && !/android|iphone|ipad|ipod/.test(userAgent);
+
     if (isIosDevice) {
       setPlatform('ios');
+    } else if (isMacOrPc) {
+      setPlatform('pc_mac');
     } else {
       setPlatform('android');
     }
@@ -47,9 +52,7 @@ export const InstallModal: React.FC<InstallModalProps> = ({
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white p-5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center text-xl backdrop-blur-xs">
-              <i className="fa-solid fa-[#fa-mobile-screen-button] fa-mobile-screen-button"></i>
-            </div>
+            <NeuromaxLogo size={42} className="shadow-md shrink-0" />
             <div>
               <h2 className="text-xl font-black leading-tight">
                 {isFr ? 'Installer NeuroMax' : 'Instalar NeuroMax'}
@@ -86,20 +89,20 @@ export const InstallModal: React.FC<InstallModalProps> = ({
           )}
 
           {/* Platform Toggle Buttons */}
-          <div className="grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+          <div className="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
             <button
               onClick={() => {
                 playAudioFeedback('click');
                 setPlatform('android');
               }}
-              className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg font-bold text-sm transition-all ${
+              className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg font-bold transition-all ${
                 platform === 'android'
                   ? 'bg-white text-indigo-700 shadow-sm border border-slate-200'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <i className="fa-brands fa-android text-emerald-600 text-base"></i>
-              <span>Android (Chrome)</span>
+              <i className="fa-brands fa-android text-emerald-600 text-sm"></i>
+              <span>Android</span>
             </button>
 
             <button
@@ -107,19 +110,34 @@ export const InstallModal: React.FC<InstallModalProps> = ({
                 playAudioFeedback('click');
                 setPlatform('ios');
               }}
-              className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg font-bold text-sm transition-all ${
+              className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg font-bold transition-all ${
                 platform === 'ios'
                   ? 'bg-white text-indigo-700 shadow-sm border border-slate-200'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <i className="fa-brands fa-apple text-slate-900 text-base"></i>
-              <span>iPhone / iPad</span>
+              <i className="fa-brands fa-apple text-slate-900 text-sm"></i>
+              <span>iPhone/iPad</span>
+            </button>
+
+            <button
+              onClick={() => {
+                playAudioFeedback('click');
+                setPlatform('pc_mac');
+              }}
+              className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg font-bold transition-all ${
+                platform === 'pc_mac'
+                  ? 'bg-white text-indigo-700 shadow-sm border border-slate-200'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <i className="fa-solid fa-desktop text-indigo-600 text-sm"></i>
+              <span>PC / Mac</span>
             </button>
           </div>
 
-          {/* Direct Install Button if supported (Chrome Android / Desktop) */}
-          {platform === 'android' && deferredPrompt && (
+          {/* Direct Install Button if supported (Chrome/Edge on Android or PC/Mac) */}
+          {(platform === 'android' || platform === 'pc_mac') && deferredPrompt && (
             <div className="bg-indigo-50 border border-indigo-200 p-4 rounded-xl text-center space-y-3">
               <p className="text-xs font-bold text-indigo-900">
                 {isFr
@@ -131,7 +149,7 @@ export const InstallModal: React.FC<InstallModalProps> = ({
                   playAudioFeedback('click');
                   onTriggerInstall();
                 }}
-                className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm"
+                className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm cursor-pointer"
               >
                 <i className="fa-solid fa-download"></i>
                 <span>{isFr ? 'Installer Maintenant' : 'Instalar Agora'}</span>
@@ -203,7 +221,7 @@ export const InstallModal: React.FC<InstallModalProps> = ({
                   </span>
                   <div className="text-xs text-slate-700 font-medium">
                     {isFr ? (
-                      <>Ouvrez impérativement ce site dans l'application <strong>Safari</strong> <i className="fa-regular fa-[#fa-compass] fa-compass text-indigo-600"></i>.</>
+                      <>Ouvrez impérativement ce site dans l'application <strong>Safari</strong> <i className="fa-regular fa-compass text-indigo-600"></i>.</>
                     ) : (
                       <>Abra este site obrigatoriamente no aplicativo <strong>Safari</strong> <i className="fa-regular fa-compass text-indigo-600"></i>.</>
                     )}
@@ -245,6 +263,64 @@ export const InstallModal: React.FC<InstallModalProps> = ({
                       <>Appuyez sur <strong>"Ajouter"</strong> en haut à droite pour valider.</>
                     ) : (
                       <>Toque em <strong>"Adicionar"</strong> no canto superior direito.</>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* PC / Mac Instructions */}
+          {platform === 'pc_mac' && (
+            <div className="space-y-3">
+              <h3 className="text-xs font-black uppercase text-slate-500 tracking-wider">
+                {isFr ? 'Installation sur Ordinateur (PC & Mac) :' : 'Instalação no Computador (PC & Mac):'}
+              </h3>
+              
+              <div className="space-y-2">
+                <div className="flex items-start gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                  <span className="w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-black flex items-center justify-center shrink-0 mt-0.5">
+                    1
+                  </span>
+                  <div className="text-xs text-slate-700 font-medium">
+                    {isFr ? (
+                      <>Utilisez <strong>Google Chrome</strong>, <strong>Microsoft Edge</strong> ou <strong>Safari (Mac)</strong>.</>
+                    ) : (
+                      <>Use <strong>Google Chrome</strong>, <strong>Microsoft Edge</strong> ou <strong>Safari (Mac)</strong>.</>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                  <span className="w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-black flex items-center justify-center shrink-0 mt-0.5">
+                    2
+                  </span>
+                  <div className="text-xs text-slate-700 font-medium">
+                    {isFr ? (
+                      <>
+                        <strong>Chrome / Edge :</strong> Cliquez sur la petite icône d'installation <i className="fa-solid fa-desktop text-indigo-600 mx-1"></i> à droite dans la barre d'adresse (ou via notre bouton 1-clic ci-dessus).
+                      </>
+                    ) : (
+                      <>
+                        <strong>Chrome / Edge:</strong> Clique no ícone de instalação <i className="fa-solid fa-desktop text-indigo-600 mx-1"></i> à direita na barra de endereço.
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                  <span className="w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-black flex items-center justify-center shrink-0 mt-0.5">
+                    3
+                  </span>
+                  <div className="text-xs text-slate-700 font-medium">
+                    {isFr ? (
+                      <>
+                        <strong>Safari sur Mac :</strong> Cliquez sur le menu <strong>Fichier</strong> en haut, puis sur <strong>"Ajouter au Dock"</strong>.
+                      </>
+                    ) : (
+                      <>
+                        <strong>Safari no Mac:</strong> Clique no menu <strong>Arquivo</strong> na parte superior e depois em <strong>"Adicionar ao Dock"</strong>.
+                      </>
                     )}
                   </div>
                 </div>

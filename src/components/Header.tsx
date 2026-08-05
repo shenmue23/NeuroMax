@@ -2,6 +2,7 @@ import React from 'react';
 import { Language, UserProgressData } from '../types';
 import { SaveSystem } from '../lib/saveSystem';
 import { playAudioFeedback } from '../lib/audio';
+import { NeuromaxLogo } from './Logo';
 
 interface HeaderProps {
   lang: Language;
@@ -9,7 +10,10 @@ interface HeaderProps {
   progress: UserProgressData;
   onOpenSettings: () => void;
   onOpenInstall: () => void;
+  onOpenPresentation?: () => void;
+  onOpenGames?: () => void;
   onGoHome: () => void;
+  currentView?: 'presentation' | 'dashboard' | 'game';
   isInGame: boolean;
 }
 
@@ -19,7 +23,10 @@ export const Header: React.FC<HeaderProps> = ({
   progress,
   onOpenSettings,
   onOpenInstall,
+  onOpenPresentation,
+  onOpenGames,
   onGoHome,
+  currentView = 'presentation',
   isInGame
 }) => {
   const levelInfo = SaveSystem.getLevel(progress.xp);
@@ -35,25 +42,16 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="bg-white border-b border-slate-200 px-4 py-3 flex flex-row justify-between items-center z-20 shrink-0 gap-3 shadow-sm">
       <div
-        className="flex items-center gap-3 cursor-pointer"
+        className="flex items-center gap-2 cursor-pointer shrink-0"
         onClick={() => {
           if (isInGame) {
             playAudioFeedback('click');
             onGoHome();
           }
         }}
+        title={lang === 'fr' ? "NeuroMax - Accueil" : "NeuroMax - Início"}
       >
-        <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-xl md:text-2xl shadow-sm hover:bg-indigo-700 transition-colors">
-          <i className="fa-solid fa-brain"></i>
-        </div>
-        <div>
-          <h1 className="text-xl md:text-2xl font-black text-slate-800 leading-none tracking-tight">
-            NeuroMax
-          </h1>
-          <p className="text-xs md:text-sm text-slate-500 font-semibold mt-0.5">
-            {lang === 'fr' ? 'Entraînement Cognitif' : 'Treino Cognitivo'}
-          </p>
-        </div>
+        <NeuromaxLogo size={40} className="hover:scale-105 transition-transform shrink-0" />
       </div>
 
       <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl shadow-sm flex-1 max-w-[200px] sm:max-w-[250px]">
@@ -82,7 +80,7 @@ export const Header: React.FC<HeaderProps> = ({
             playAudioFeedback('click');
             setLang('fr');
           }}
-          className={`px-2 py-1.5 md:px-3 rounded-lg text-xs md:text-sm font-bold transition-all ${
+          className={`px-2 py-1.5 md:px-3 rounded-lg text-xs md:text-sm font-bold transition-all cursor-pointer ${
             lang === 'fr'
               ? 'bg-indigo-600 text-white shadow-sm'
               : 'text-slate-600 hover:bg-slate-200'
@@ -95,34 +93,13 @@ export const Header: React.FC<HeaderProps> = ({
             playAudioFeedback('click');
             setLang('pt');
           }}
-          className={`px-2 py-1.5 md:px-3 rounded-lg text-xs md:text-sm font-bold transition-all ${
+          className={`px-2 py-1.5 md:px-3 rounded-lg text-xs md:text-sm font-bold transition-all cursor-pointer ${
             lang === 'pt'
               ? 'bg-indigo-600 text-white shadow-sm'
               : 'text-slate-600 hover:bg-slate-200'
           }`}
         >
           PT
-        </button>
-        <button
-          onClick={() => {
-            playAudioFeedback('click');
-            onOpenInstall();
-          }}
-          className="px-2 py-1.5 md:px-3 rounded-lg text-xs md:text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-all flex items-center gap-1.5 shadow-2xs"
-          title={lang === 'fr' ? "Installer l'app (Android / iPhone)" : "Instalar App (Android / iPhone)"}
-        >
-          <i className="fa-solid fa-mobile-screen-button"></i>
-          <span className="hidden sm:inline">{lang === 'fr' ? 'Installer App' : 'Instalar App'}</span>
-        </button>
-        <button
-          onClick={() => {
-            playAudioFeedback('click');
-            onOpenSettings();
-          }}
-          className="px-2 py-1.5 md:px-3 rounded-lg text-xs md:text-sm font-bold text-slate-500 hover:bg-slate-200 transition-all"
-          title="Paramètres / Definições"
-        >
-          <i className="fa-solid fa-gear"></i>
         </button>
       </div>
     </header>

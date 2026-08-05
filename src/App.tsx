@@ -23,7 +23,56 @@ import { PathGame } from './components/games/PathGame';
 import { QuizGames } from './components/games/QuizGames';
 import { ChroniGame } from './components/games/ChroniGame';
 
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-16 h-16 bg-red-500/20 text-red-400 rounded-2xl flex items-center justify-center text-3xl mb-4 border border-red-500/30">
+            <i className="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <h1 className="text-2xl font-black mb-2">Une erreur s'est produite</h1>
+          <p className="text-slate-400 text-sm max-w-md mb-6 font-mono bg-slate-800/80 p-3 rounded-lg border border-slate-700/50 break-all">
+            {this.state.error?.message || "Erreur inconnue lors du chargement de l'application."}
+          </p>
+          <button
+            onClick={() => {
+              localStorage.clear();
+              window.location.reload();
+            }}
+            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg cursor-pointer"
+          >
+            Réinitialiser & Recharger
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
+  return (
+    <ErrorBoundary>
+      <MainApp />
+    </ErrorBoundary>
+  );
+}
+
+function MainApp() {
   const [lang, setLang] = useState<Language>('pt');
   const [progress, setProgress] = useState<UserProgressData>({ games: {}, xp: 0 });
   const [selectedGame, setSelectedGame] = useState<GameData | null>(null);

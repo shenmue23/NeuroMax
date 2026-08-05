@@ -1,0 +1,6 @@
+{
+  "name": "NeuroMax",
+  "description": "Treino Cognitivo & Jeux de stimulation cérébrale (Billes, UNO, Prénoms, Sudoku, etc.)",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

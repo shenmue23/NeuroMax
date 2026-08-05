@@ -73,11 +73,31 @@ export default function App() {
   );
 }
 
+const checkIsStandalone = () => {
+  if (typeof window === 'undefined') return false;
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (window.navigator as any).standalone === true ||
+    document.referrer.includes('android-app://') ||
+    window.location.search.includes('installed=true') ||
+    localStorage.getItem('neuromax_installed') === 'true'
+  );
+};
+
 function MainApp() {
   const [lang, setLang] = useState<Language>('pt');
   const [progress, setProgress] = useState<UserProgressData>({ games: {}, xp: 0 });
   const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
-  const [viewMode, setViewMode] = useState<'presentation' | 'dashboard'>('presentation');
+  const [viewMode, setViewMode] = useState<'presentation' | 'dashboard'>(() => {
+    if (checkIsStandalone()) {
+      return 'dashboard';
+    }
+    const saved = localStorage.getItem('neuromax_view');
+    if (saved === 'dashboard') {
+      return 'dashboard';
+    }
+    return 'presentation';
+  });
 
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isInstallOpen, setIsInstallOpen] = useState<boolean>(false);
@@ -100,15 +120,27 @@ function MainApp() {
     const loaded = SaveSystem.load();
     setProgress(loaded);
 
+    if (checkIsStandalone()) {
+      setViewMode('dashboard');
+    }
+
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
     };
 
+    const handleAppInstalled = () => {
+      localStorage.setItem('neuromax_installed', 'true');
+      localStorage.setItem('neuromax_view', 'dashboard');
+      setViewMode('dashboard');
+    };
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
 
@@ -117,6 +149,9 @@ function MainApp() {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
+        localStorage.setItem('neuromax_installed', 'true');
+        localStorage.setItem('neuromax_view', 'dashboard');
+        setViewMode('dashboard');
         setDeferredPrompt(null);
       }
     }
@@ -129,7 +164,7 @@ function MainApp() {
 
   const handleGoHome = () => {
     setSelectedGame(null);
-    setViewMode('presentation');
+    setViewMode('dashboard');
     setEndModal({ isOpen: false, isWin: true, leveledUp: false, stars: 0 });
   };
 
@@ -192,7 +227,10 @@ function MainApp() {
             lang={lang}
             setLang={setLang}
             onOpenInstall={() => setIsInstallOpen(true)}
-            onStartPlaying={() => setViewMode('dashboard')}
+            onStartPlaying={() => {
+              localStorage.setItem('neuromax_view', 'dashboard');
+              setViewMode('dashboard');
+            }}
           />
         ) : !selectedGame ? (
           <Dashboard

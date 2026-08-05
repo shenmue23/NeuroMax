@@ -171,8 +171,38 @@ export const UnoGame: React.FC<UnoGameProps> = ({ lang, level, onFinish }) => {
       return;
     }
 
-    setStatusText(t.unoBotTurn);
-    setTimeout(() => botTurn(newDiscard, drawPile, botHand, chosenColor, card.value), 1000);
+    // Apply draw penalty to bot if +2 or +4 was played
+    let currentBotHand = [...botHand];
+    let currentDraw = [...drawPile];
+    let currentDiscard = [...newDiscard];
+
+    let extraDraws = 0;
+    if (card.value === '+2') extraDraws = 2;
+    if (card.value === '+4') extraDraws = 4;
+
+    if (extraDraws > 0) {
+      for (let i = 0; i < extraDraws; i++) {
+        if (currentDraw.length === 0) {
+          const top = currentDiscard.pop()!;
+          currentDraw = currentDiscard.sort(() => Math.random() - 0.5);
+          currentDiscard = [top];
+        }
+        if (currentDraw.length > 0) {
+          currentBotHand.push(currentDraw.pop()!);
+        }
+      }
+      setBotHand(currentBotHand);
+      setDrawPile(currentDraw);
+      setDiscardPile(currentDiscard);
+    }
+
+    setStatusText(
+      extraDraws > 0
+        ? (lang === 'fr' ? `L'adversaire pioche +${extraDraws} cartes !` : `O oponente compra +${extraDraws} cartas !`)
+        : t.unoBotTurn
+    );
+
+    setTimeout(() => botTurn(currentDiscard, currentDraw, currentBotHand, chosenColor, card.value), 1200);
   };
 
   const drawCard = () => {
@@ -229,6 +259,34 @@ export const UnoGame: React.FC<UnoGameProps> = ({ lang, level, onFinish }) => {
         setGameOver(true);
         setStatusText(lang === 'fr' ? "L'ordinateur a gagné !" : "O computador ganhou !");
         setTimeout(() => onFinish(false), 800);
+        return;
+      }
+
+      // If bot played +2 or +4, player must draw extra cards
+      let extraDraws = 0;
+      if (card.value === '+2') extraDraws = 2;
+      if (card.value === '+4') extraDraws = 4;
+
+      if (extraDraws > 0) {
+        let currentPHand = [...playerHand];
+        for (let i = 0; i < extraDraws; i++) {
+          if (localDraw.length === 0) {
+            const top = localDiscard.pop()!;
+            localDraw = localDiscard.sort(() => Math.random() - 0.5);
+            localDiscard = [top];
+          }
+          if (localDraw.length > 0) {
+            currentPHand.push(localDraw.pop()!);
+          }
+        }
+        setPlayerHand(currentPHand);
+        setDrawPile(localDraw);
+        setDiscardPile(localDiscard);
+        setStatusText(
+          lang === 'fr'
+            ? `L'ordinateur a joué un ${card.value} ! Vous piochez ${extraDraws} cartes.`
+            : `O computador jogou um ${card.value} ! Você compra ${extraDraws} cartas.`
+        );
         return;
       }
     } else {

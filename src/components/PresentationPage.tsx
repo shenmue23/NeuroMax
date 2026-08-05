@@ -9,6 +9,7 @@ interface PresentationPageProps {
   onOpenInstall: () => void;
   onStartPlaying: () => void;
   onClose?: () => void;
+  isInstalled?: boolean;
 }
 
 export const PresentationPage: React.FC<PresentationPageProps> = ({
@@ -17,6 +18,7 @@ export const PresentationPage: React.FC<PresentationPageProps> = ({
   onOpenInstall,
   onStartPlaying,
   onClose,
+  isInstalled = false,
 }) => {
   const [copied, setCopied] = useState<boolean>(false);
   const isFr = lang === 'fr';
@@ -218,16 +220,18 @@ export const PresentationPage: React.FC<PresentationPageProps> = ({
             <span>{isFr ? '🎮 Jouer maintenant (Accéder aux jeux)' : '🎮 Jogar agora (Ir para os jogos)'}</span>
           </button>
 
-          <button
-            onClick={() => {
-              playAudioFeedback('click');
-              onOpenInstall();
-            }}
-            className="py-4 px-6 bg-indigo-900 hover:bg-indigo-800 text-white font-bold text-sm sm:text-base rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer border border-indigo-700 shrink-0"
-          >
-            <i className="fa-solid fa-mobile-screen-button text-lg text-emerald-400"></i>
-            <span>{isFr ? 'Installer l\'application' : 'Instalar a aplicação'}</span>
-          </button>
+          {!isInstalled && (
+            <button
+              onClick={() => {
+                playAudioFeedback('click');
+                onOpenInstall();
+              }}
+              className="py-4 px-6 bg-indigo-900 hover:bg-indigo-800 text-white font-bold text-sm sm:text-base rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer border border-indigo-700 shrink-0"
+            >
+              <i className="fa-solid fa-mobile-screen-button text-lg text-emerald-400"></i>
+              <span>{isFr ? 'Installer l\'application' : 'Instalar a aplicação'}</span>
+            </button>
+          )}
         </div>
 
         {/* 5. BOTTOM RIBBON BANNER */}

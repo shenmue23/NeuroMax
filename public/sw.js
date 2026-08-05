@@ -1,10 +1,10 @@
 const CACHE_NAME = 'neuromax-pwa-v1';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.svg',
-  '/icon-512.svg'
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.svg',
+  './icon-512.svg'
 ];
 
 self.addEventListener('install', (event) => {
@@ -61,7 +61,7 @@ self.addEventListener('fetch', (event) => {
       }).catch(() => {
         // Return index.html for navigation requests offline
         if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
+          return caches.match('./index.html').then(res => res || caches.match('./'));
         }
       });
     })

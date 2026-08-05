@@ -205,17 +205,28 @@ export const PresentationPage: React.FC<PresentationPageProps> = ({
 
 
 
-        {/* Action Button: Mandatory Install App (Hidden when printing) */}
-        <div className="mb-4 print:hidden">
+        {/* Action Buttons: Play Now & Install App (Hidden when printing) */}
+        <div className="mb-4 print:hidden flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={() => {
+              playAudioFeedback('click');
+              onStartPlaying();
+            }}
+            className="flex-1 py-4 px-6 bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-base sm:text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3 cursor-pointer border-2 border-amber-300"
+          >
+            <i className="fa-solid fa-gamepad text-2xl text-slate-900"></i>
+            <span>{isFr ? '🎮 Jouer maintenant (Accéder aux jeux)' : '🎮 Jogar agora (Ir para os jogos)'}</span>
+          </button>
+
           <button
             onClick={() => {
               playAudioFeedback('click');
               onOpenInstall();
             }}
-            className="w-full py-4 px-6 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3 cursor-pointer border-2 border-emerald-300"
+            className="py-4 px-6 bg-indigo-900 hover:bg-indigo-800 text-white font-bold text-sm sm:text-base rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer border border-indigo-700 shrink-0"
           >
-            <i className="fa-solid fa-download text-xl"></i>
-            <span>{isFr ? '📲 Installer l\'application NeuroMax' : '📲 Instalar a aplicação NeuroMax'}</span>
+            <i className="fa-solid fa-mobile-screen-button text-lg text-emerald-400"></i>
+            <span>{isFr ? 'Installer l\'application' : 'Instalar a aplicação'}</span>
           </button>
         </div>
 

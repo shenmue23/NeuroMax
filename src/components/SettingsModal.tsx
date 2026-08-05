@@ -8,6 +8,7 @@ interface SettingsModalProps {
   lang: Language;
   progress: UserProgressData;
   onImportProgress: (data: UserProgressData) => void;
+  onOpenInstall?: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -15,7 +16,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   lang,
   progress,
-  onImportProgress
+  onImportProgress,
+  onOpenInstall
 }) => {
   if (!isOpen) return null;
 
@@ -69,6 +71,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         <div className="flex flex-col gap-3">
+          {onOpenInstall && (
+            <button
+              onClick={() => {
+                playAudioFeedback('click');
+                onClose();
+                onOpenInstall();
+              }}
+              className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors shadow-sm"
+            >
+              <i className="fa-solid fa-mobile-screen-button"></i>
+              {lang === 'fr' ? 'Installer sur Mobile / Tablette' : 'Instalar no Celular / Tablet'}
+            </button>
+          )}
+
           <button
             onClick={handleExport}
             className="w-full bg-indigo-100 text-indigo-700 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-200 transition-colors"

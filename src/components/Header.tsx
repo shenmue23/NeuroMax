@@ -8,6 +8,7 @@ interface HeaderProps {
   setLang: (lang: Language) => void;
   progress: UserProgressData;
   onOpenSettings: () => void;
+  onOpenInstall: () => void;
   onGoHome: () => void;
   isInGame: boolean;
 }
@@ -17,6 +18,7 @@ export const Header: React.FC<HeaderProps> = ({
   setLang,
   progress,
   onOpenSettings,
+  onOpenInstall,
   onGoHome,
   isInGame
 }) => {
@@ -100,6 +102,17 @@ export const Header: React.FC<HeaderProps> = ({
           }`}
         >
           PT
+        </button>
+        <button
+          onClick={() => {
+            playAudioFeedback('click');
+            onOpenInstall();
+          }}
+          className="px-2 py-1.5 md:px-3 rounded-lg text-xs md:text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-all flex items-center gap-1.5 shadow-2xs"
+          title={lang === 'fr' ? "Installer l'app (Android / iPhone)" : "Instalar App (Android / iPhone)"}
+        >
+          <i className="fa-solid fa-mobile-screen-button"></i>
+          <span className="hidden sm:inline">{lang === 'fr' ? 'Installer App' : 'Instalar App'}</span>
         </button>
         <button
           onClick={() => {

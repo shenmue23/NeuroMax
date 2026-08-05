@@ -8,6 +8,7 @@ import { Header } from './components/Header';
 import { Dashboard, GAMES_LIST } from './components/Dashboard';
 import { SettingsModal } from './components/SettingsModal';
 import { EndScreenModal } from './components/EndScreenModal';
+import { InstallModal } from './components/InstallModal';
 
 import { PegSolitaireGame } from './components/games/PegSolitaireGame';
 import { UnoGame } from './components/games/UnoGame';
@@ -28,6 +29,8 @@ export default function App() {
   const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [isInstallOpen, setIsInstallOpen] = useState<boolean>(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [endModal, setEndModal] = useState<{
     isOpen: boolean;
     isWin: boolean;
@@ -45,7 +48,28 @@ export default function App() {
   useEffect(() => {
     const loaded = SaveSystem.load();
     setProgress(loaded);
+
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
   }, []);
+
+  const handleTriggerInstall = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    }
+  };
 
   const handleSelectGame = (game: GameData) => {
     setSelectedGame(game);
@@ -96,6 +120,7 @@ export default function App() {
         setLang={setLang}
         progress={progress}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenInstall={() => setIsInstallOpen(true)}
         onGoHome={handleGoHome}
         isInGame={selectedGame !== null}
       />
@@ -106,6 +131,7 @@ export default function App() {
             lang={lang}
             progress={progress}
             onSelectGame={handleSelectGame}
+            onOpenInstall={() => setIsInstallOpen(true)}
           />
         ) : (
           <div className="w-full h-full flex flex-col bg-slate-50">
@@ -281,6 +307,15 @@ export default function App() {
         lang={lang}
         progress={progress}
         onImportProgress={(newProg) => setProgress(newProg)}
+        onOpenInstall={() => setIsInstallOpen(true)}
+      />
+
+      <InstallModal
+        isOpen={isInstallOpen}
+        onClose={() => setIsInstallOpen(false)}
+        lang={lang}
+        deferredPrompt={deferredPrompt}
+        onTriggerInstall={handleTriggerInstall}
       />
     </div>
   );

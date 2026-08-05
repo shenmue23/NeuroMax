@@ -9,6 +9,7 @@ import { Dashboard, GAMES_LIST } from './components/Dashboard';
 import { SettingsModal } from './components/SettingsModal';
 import { EndScreenModal } from './components/EndScreenModal';
 import { InstallModal } from './components/InstallModal';
+import { PresentationPage } from './components/PresentationPage';
 
 import { PegSolitaireGame } from './components/games/PegSolitaireGame';
 import { UnoGame } from './components/games/UnoGame';
@@ -76,6 +77,7 @@ function MainApp() {
   const [lang, setLang] = useState<Language>('pt');
   const [progress, setProgress] = useState<UserProgressData>({ games: {}, xp: 0 });
   const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
+  const [viewMode, setViewMode] = useState<'presentation' | 'dashboard'>('presentation');
 
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isInstallOpen, setIsInstallOpen] = useState<boolean>(false);
@@ -127,6 +129,7 @@ function MainApp() {
 
   const handleGoHome = () => {
     setSelectedGame(null);
+    setViewMode('presentation');
     setEndModal({ isOpen: false, isWin: true, leveledUp: false, stars: 0 });
   };
 
@@ -170,17 +173,34 @@ function MainApp() {
         progress={progress}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenInstall={() => setIsInstallOpen(true)}
+        onOpenPresentation={() => {
+          setSelectedGame(null);
+          setViewMode('presentation');
+        }}
+        onOpenGames={() => {
+          setSelectedGame(null);
+          setViewMode('dashboard');
+        }}
         onGoHome={handleGoHome}
+        currentView={selectedGame ? 'game' : viewMode}
         isInGame={selectedGame !== null}
       />
 
       <main className="flex-grow overflow-y-auto relative w-full hide-scrollbar">
-        {!selectedGame ? (
+        {!selectedGame && viewMode === 'presentation' ? (
+          <PresentationPage
+            lang={lang}
+            setLang={setLang}
+            onOpenInstall={() => setIsInstallOpen(true)}
+            onStartPlaying={() => setViewMode('dashboard')}
+          />
+        ) : !selectedGame ? (
           <Dashboard
             lang={lang}
             progress={progress}
             onSelectGame={handleSelectGame}
             onOpenInstall={() => setIsInstallOpen(true)}
+            onOpenPresentation={() => setViewMode('presentation')}
           />
         ) : (
           <div className="w-full h-full flex flex-col bg-slate-50">
